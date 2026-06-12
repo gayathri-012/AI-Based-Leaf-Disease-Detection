@@ -165,22 +165,6 @@ python app.py
 
 ---
 
-## 👩‍💻 Author
-
-**Gayathri**
-MCA Graduate
-
-### Skills
-- Python
-- Flask
-- MySQL
-- Artificial Intelligence
-- Machine Learning
-- Web Development
-- Computer Vision
-
----
-
 ## 📜 License
 
 This project is developed for educational and research purposes.
