@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a2332;
+        }
+
+        .container {
+            position: relative;
+            width: 900px;
+            height: 550px;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.5);
+        }
+
+        /* Forms Section */
+        .form-box {
+            width: 50%;
+            height: 100%;
+            padding: 60px;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: absolute;
+            top: 0;
+            opacity: 1;
+        }
+
+        .login-box {
+            left: 0;
+            z-index: 5;
+            transform: translateX(0);
+        }
+
+        .register-box {
+            left: 100%;
+            z-index: 4;
+            transform: translateX(0);
+            opacity: 0;
+        }
+
+        .container.active .login-box {
+            left: -100%;
+            z-index: 4;
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+
+        .container.active .register-box {
+            left: 50%;
+            z-index: 5;
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: #f1f1f1;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border: 2px solid #20c997;
+            background: #fff;
+        }
+
+        button {
+            width: 150px;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #20c997, #17a2b8);
+            color: white;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(32, 201, 151, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #1ab386, #138496);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(32, 201, 151, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Sliding Panel */
+        .panel {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2332, #243447);
+            color: #fff;
+            position: absolute;
+            right: 0;
+            top: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 6;
+            transform: translateX(0);
+        }
+
+        .container.active .panel {
+            right: 50%;
+            transform: translateX(10px);
+        }
+
+        .panel h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .panel p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.6s ease-out 0.1s;
+            animation-fill-mode: both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .switch-btn {
+            background: transparent;
+            border: 2px solid #20c997;
+            padding: 10px 30px;
+            border-radius: 25px;
+            color: #20c997;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .switch-btn:hover {
+            background: linear-gradient(135deg, #20c997, #17a2b8);
+            color: #fff;
+            border-color: #20c997;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(32, 201, 151, 0.4);
+        }
+
+        .switch-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .form-box {
+                width: 100%;
+                padding: 40px;
+            }
+
+            .panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container" id="container">
+
+    <!-- LOGIN FORM -->
+    <form class="form-box login-box" id="loginForm">
+        <h2>Login</h2>
+
+        <input type="email" id="login_email" placeholder="Email" required>
+        <input type="password" id="login_password" placeholder="Password" required>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form class="form-box register-box" id="registerForm">
+        <h2>Create Account</h2>
+
+        <input type="text" id="reg_name" placeholder="Full Name" required>
+        <input type="email" id="reg_email" placeholder="Email" required>
+        <input type="password" id="reg_password" placeholder="Password" minlength="6" required>
+
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <!-- SLIDING PANEL -->
+    <div class="panel">
+        <h1 id="panelTitle">New Here?</h1>
+        <p id="panelText">Create an account to continue</p>
+
+        <button class="switch-btn" id="switchBtn">Sign Up</button>
+    </div>
+
+</div>
+<script>
+const API = "http://127.0.0.1:5001"; // Flask backend URL
+
+const container = document.getElementById("container");
+const switchBtn = document.getElementById("switchBtn");
+const panelTitle = document.getElementById("panelTitle");
+const panelText = document.getElementById("panelText");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+/* ---------- SWITCH LOGIN / REGISTER ---------- */
+switchBtn.onclick = () => {
+    container.classList.toggle("active");
+
+    panelTitle.style.animation = "none";
+    panelText.style.animation = "none";
+
+    setTimeout(() => {
+        if (container.classList.contains("active")) {
+            panelTitle.textContent = "Already have an account?";
+            panelText.textContent = "Login now to continue";
+            switchBtn.textContent = "Login";
+        } else {
+            panelTitle.textContent = "New Here?";
+            panelText.textContent = "Create an account to continue";
+            switchBtn.textContent = "Sign Up";
+        }
+
+        panelTitle.style.animation = "";
+        panelText.style.animation = "";
+    }, 50);
+};
+
+/* ---------- LOGIN ---------- */
+loginForm.onsubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+        const res = await fetch(`${API}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: document.getElementById("login_email").value,
+                password: document.getElementById("login_password").value
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.status === "success") {
+            localStorage.setItem(
+                "user",
+                JSON.stringify({ email: document.getElementById("login_email").value })
+            );
+            window.location.href = "index.html"; // redirect ONLY after login
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        alert("Login failed. Please try again.");
+        console.error("Login error:", error);
+    }
+};
+
+/* ---------- REGISTER ---------- */
+registerForm.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const password = document.getElementById("reg_password").value;
+    if (password.length < 6) {
+        alert("Password must be at least 6 characters long");
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: document.getElementById("reg_name").value,
+                email: document.getElementById("reg_email").value,
+                password: password
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.status === "success") {
+            alert("Account created successfully!");
+
+            // after clicking OK → show login form
+            container.classList.remove("active");
+            registerForm.reset();
+
+            // prevent browser auto-login
+            document.getElementById("login_email").value = "";
+            document.getElementById("login_password").value = "";
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        alert("Registration failed. Please try again.");
+        console.error("Register error:", error);
+    }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Chat Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI', Arial, sans-serif;
+  background:linear-gradient(135deg, #0a0e1a 0%, #1a2332 50%, #0f172a 100%);
+  color:white;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+
+body::before{
+  content:'';
+  position:absolute;
+  width:500px;
+  height:500px;
+  background:radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%);
+  top:-100px;
+  right:-100px;
+  border-radius:50%;
+  animation:float 8s ease-in-out infinite;
+}
+
+body::after{
+  content:'';
+  position:absolute;
+  width:400px;
+  height:400px;
+  background:radial-gradient(circle, rgba(52,211,153,0.1) 0%, transparent 70%);
+  bottom:-100px;
+  left:-100px;
+  border-radius:50%;
+  animation:float 10s ease-in-out infinite reverse;
+}
+
+@keyframes float{
+  0%, 100%{transform:translate(0, 0) scale(1);}
+  50%{transform:translate(30px, 30px) scale(1.1);}
+}
+
+#ai-chat-container{
+  width:500px;
+  height:700px;
+  background:rgba(2,6,23,0.95);
+  border-radius:24px;
+  display:flex;
+  flex-direction:column;
+  z-index:1;
+  box-shadow:0 25px 60px rgba(0,0,0,0.8);
+  border:1px solid rgba(52,211,153,0.3);
+  backdrop-filter:blur(20px);
+  overflow:hidden;
+}
+
+#ai-chat-header{
+  background:linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding:25px 30px;
+  font-weight:700;
+  font-size:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+#ai-chat-messages{
+  flex:1;
+  padding:25px;
+  overflow-y:auto;
+  font-size:15px;
+  line-height:1.6;
+}
+
+#ai-chat-messages::-webkit-scrollbar{
+  width:8px;
+}
+
+#ai-chat-messages::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.05);
+  border-radius:4px;
+}
+
+#ai-chat-messages::-webkit-scrollbar-thumb{
+  background:rgba(52,211,153,0.4);
+  border-radius:4px;
+}
+
+#ai-chat-messages::-webkit-scrollbar-thumb:hover{
+  background:rgba(52,211,153,0.6);
+}
+
+#ai-chat-input{
+  display:flex;
+  gap:12px;
+  padding:20px;
+  background:rgba(255,255,255,0.03);
+  border-top:1px solid rgba(52,211,153,0.2);
+}
+
+#ai-chat-text{
+  flex:1;
+  padding:14px 18px;
+  border-radius:12px;
+  border:1px solid rgba(52,211,153,0.3);
+  background:rgba(255,255,255,0.05);
+  color:white;
+  font-size:15px;
+  transition:all 0.3s;
+}
+
+#ai-chat-text:focus{
+  outline:none;
+  border-color:#34d399;
+  box-shadow:0 0 0 3px rgba(52,211,153,0.1);
+  background:rgba(255,255,255,0.08);
+}
+
+#ai-chat-send{
+  background:linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:14px 28px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:15px;
+  box-shadow:0 4px 15px rgba(16,185,129,0.4);
+  transition:all 0.3s;
+}
+
+#ai-chat-send:hover{
+  box-shadow:0 6px 20px rgba(16,185,129,0.6);
+  transform:translateY(-2px);
+}
+
+#ai-chat-send:active{
+  transform:translateY(0);
+}
+
+.ai-user{
+  color:#34d399;
+  margin:16px 0;
+  padding:14px 18px;
+  background:rgba(52,211,153,0.1);
+  border-radius:12px;
+  border-left:3px solid #34d399;
+  animation:slideIn 0.3s ease-out;
+}
+
+.ai-bot{
+  color:#e5e7eb;
+  margin:16px 0;
+  padding:14px 18px;
+  background:rgba(255,255,255,0.05);
+  border-radius:12px;
+  border-left:3px solid #10b981;
+  animation:slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.loading{
+  display:inline-block;
+  animation:blink 1.4s infinite;
+}
+
+@keyframes blink{
+  0%, 100%{opacity:1;}
+  50%{opacity:0.3;}
+}
+
+.welcome-message{
+  text-align:center;
+  color:#94a3b8;
+  padding:40px 20px;
+  font-size:15px;
+  line-height:1.8;
+}
+
+.welcome-message h2{
+  color:#34d399;
+  font-size:24px;
+  margin-bottom:15px;
+  text-shadow:0 0 20px rgba(52,211,153,0.4);
+}
+</style>
+</head>
+
+<body>
+<div id="ai-chat-container">
+  <div id="ai-chat-header">
+    <span>🤖</span>
+    <span>AgriScan AI Assistant</span>
+  </div>
+  
+  <div id="ai-chat-messages">
+    <div class="welcome-message">
+      <h2>👋 Welcome!</h2>
+      <p>I'm your AgriScan AI Assistant. Ask me anything about leaf diseases, treatments, prevention methods, or agricultural advice!</p>
+    </div>
+  </div>
+  
+  <div id="ai-chat-input">
+    <input type="text" id="ai-chat-text" placeholder="Ask about recovery, treatment, prevention..." />
+    <button id="ai-chat-send">Send</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+let lastAIResult = null;
+
+const sendBtn = document.getElementById("ai-chat-send");
+const chatText = document.getElementById("ai-chat-text");
+const chatMessages = document.getElementById("ai-chat-messages");
+
+sendBtn.onclick = sendMessage;
+
+chatText.addEventListener("keypress", function(e){
+  if(e.key === "Enter"){
+    sendMessage();
+  }
+});
+
+function addMsg(text, type){
+  const div = document.createElement("div");
+  div.className = type === "user" ? "ai-user" : "ai-bot";
+  div.innerText = (type === "user" ? "You: " : "🤖 AI: ") + text;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function sendMessage(){
+  const q = chatText.value.trim();
+  if(!q) return;
+
+  addMsg(q, "user");
+  chatText.value = "";
+
+  const loadingDiv = document.createElement("div");
+  loadingDiv.className = "ai-bot";
+  loadingDiv.innerHTML = '🤖 AI: <span class="loading">Thinking...</span>';
+  chatMessages.appendChild(loadingDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  try{
+    const res = await fetch("http://127.0.0.1:5000/chatbot", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        question: q,
+        disease_info: lastAIResult
+      })
+    });
+
+    const data = await res.json();
+    chatMessages.removeChild(loadingDiv);
+    addMsg(data.answer || "Sorry, I encountered an error.", "bot");
+  } catch(err) {
+    chatMessages.removeChild(loadingDiv);
+    addMsg("Connection error. Please check if the backend server is running on http://127.0.0.1:5000", "bot");
+  }
+}
+
+
+
+// Optional: Simulate having disease data for testing
+// Uncomment the following to test the chat without uploading an image first
+/*
+lastAIResult = {
+  leaf_type: "Tomato",
+  disease: "Early Blight",
+  confidence: 92,
+  severity: "Moderate",
+  cause: "Fungal infection caused by Alternaria solani",
+  prevention: ["Crop rotation", "Remove infected leaves", "Maintain plant spacing"],
+  treatment: ["Apply fungicide", "Use copper-based sprays", "Improve air circulation"]
+};
+*/
+
+});
+</script>
+</body>
+</html>

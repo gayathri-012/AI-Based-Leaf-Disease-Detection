@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Engine | AgriScan AI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --secondary: #34d399;
+      --dark: #0f172a;
+      --gray: #64748b;
+      --light: #f1f5f9;
+      --white: #ffffff;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #22c55e;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background: #0f172a;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 20s infinite;
+    }
+
+    .bg-circle:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      background: var(--primary);
+      top: -150px;
+      right: -150px;
+      animation-duration: 25s;
+    }
+
+    .bg-circle:nth-child(2) {
+      width: 400px;
+      height: 400px;
+      background: var(--secondary);
+      bottom: -200px;
+      left: -200px;
+      animation-duration: 30s;
+      animation-delay: 5s;
+    }
+
+    .bg-circle:nth-child(3) {
+      width: 250px;
+      height: 250px;
+      background: var(--primary);
+      top: 50%;
+      left: 50%;
+      animation-duration: 20s;
+      animation-delay: 10s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(50px, -50px) scale(1.1);
+      }
+      66% {
+        transform: translate(-50px, 50px) scale(0.9);
+      }
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      animation: slideDown 0.8s ease;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      padding: 1.5rem 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .logo-icon {
+      width: 55px;
+      height: 55px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      }
+      50% {
+        box-shadow: 0 10px 40px rgba(16, 185, 129, 0.6);
+      }
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .stats-badge {
+      background: rgba(16, 185, 129, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      color: var(--secondary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .back-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--white);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Main Layout */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2rem;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Upload Section */
+    .upload-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow: 0 20px 60px rgba(16, 185, 129, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    /* Upload Area */
+    .upload-area {
+      position: relative;
+      border: 3px dashed rgba(16, 185, 129, 0.3);
+      border-radius: 20px;
+      padding: 3rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      background: rgba(16, 185, 129, 0.02);
+      overflow: hidden;
+    }
+
+    .upload-area::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .upload-area:hover::before {
+      left: 100%;
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.05);
+      transform: scale(1.02);
+    }
+
+    .upload-area.dragover {
+      border-color: var(--secondary);
+      background: rgba(16, 185, 129, 0.1);
+      transform: scale(1.05);
+    }
+
+    .upload-icon {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 3rem;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .upload-text {
+      font-size: 1.3rem;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .upload-subtext {
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+
+    .upload-formats {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .format-badge {
+      background: rgba(16, 185, 129, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      color: var(--secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* Image Preview */
+    .preview-section {
+      display: none;
+      animation: zoomIn 0.5s ease;
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .preview-wrapper {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      margin-bottom: 1.5rem;
+    }
+
+    .preview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+      z-index: 1;
+    }
+
+    #previewImage {
+      width: 100%;
+      height: 450px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-actions {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 2;
+    }
+
+    .action-btn {
+      width: 45px;
+      height: 45px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      border: none;
+      border-radius: 12px;
+      color: var(--white);
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-btn:hover {
+      background: var(--danger);
+      transform: scale(1.1);
+    }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 1.3rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      border: none;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .analyze-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .analyze-btn:hover:not(:disabled)::before {
+      left: 100%;
+    }
+
+    .analyze-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Tips Section */
+    .tips-card {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .tips-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .tip-item {
+      display: flex;
+      align-items: start;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .tip-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateX(5px);
+    }
+
+    .tip-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(245, 158, 11, 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .tip-content {
+      flex: 1;
+    }
+
+    .tip-title {
+      color: var(--warning);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .tip-text {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    /* Results Section */
+    .results-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray);
+    }
+
+    .empty-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.3;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .empty-text {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Loading State */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .spinner-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 2rem;
+    }
+
+    .spinner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 4px solid rgba(16, 185, 129, 0.2);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .spinner:nth-child(2) {
+      border-top-color: var(--secondary);
+      animation-duration: 1.5s;
+      animation-direction: reverse;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: var(--white);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .loading-subtext {
+      color: var(--gray);
+    }
+
+    /* Results Content */
+    .results-content {
+      display: none;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Disease Card */
+    .disease-card {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--white);
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(16, 185, 129, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .disease-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 10s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .disease-header {
+      position: relative;
+      z-index: 1;
+    }
+
+    .disease-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .disease-name {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .confidence-section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .confidence-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .confidence-bar {
+      background: rgba(255, 255, 255, 0.2);
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .confidence-fill {
+      background: var(--white);
+      height: 100%;
+      border-radius: 6px;
+      transition: width 1.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .confidence-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Info Cards */
+    .info-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .info-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.15);
+    }
+
+    .info-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-icon-large {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .info-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .info-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .info-list li {
+      padding: 0.9rem 0;
+      color: rgba(255, 255, 255, 0.7);
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .info-list li:hover {
+      color: var(--white);
+      padding-left: 0.5rem;
+    }
+
+    .info-list li:last-child {
+      border-bottom: none;
+    }
+
+    .info-list li::before {
+      content: "✓";
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* Severity Indicator */
+    .severity-card {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .severity-levels {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .severity-level {
+      flex: 1;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .severity-level.active {
+      background: rgba(239, 68, 68, 0.2);
+      border: 2px solid var(--danger);
+    }
+
+    .severity-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .severity-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .action-button {
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: var(--white);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .action-button:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .stats-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+      }
+
+      .upload-area {
+        padding: 2rem 1rem;
+      }
+
+      .upload-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+      }
+
+      #previewImage {
+        height: 300px;
+      }
+
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .disease-name {
+        font-size: 1.5rem;
+      }
+    }
+    /* Floating Chatbot Button */
+#ai-chat-fab {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  width: 65px;
+  height: 65px;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  border-radius: 50%;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99999;
+  box-shadow: 0 10px 30px rgba(16,185,129,0.6);
+}
+
+#ai-chat-popup {
+  position: fixed;
+  bottom: 90px;
+  left: 20px;
+}
+
+/* === PRO CHATBOT (Same as aichat.html) === */
+
+.pro-chat{
+  background:rgba(2,6,23,0.96);
+  border-radius:24px;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid rgba(52,211,153,0.3);
+  backdrop-filter:blur(20px);
+}
+
+.pro-chat-header{
+  background:linear-gradient(135deg,#10b981,#059669);
+  padding:18px 22px;
+  font-weight:700;
+  font-size:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.pro-chat-messages{
+  flex:1;
+  padding:22px;
+  overflow-y:auto;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.pro-chat-input{
+  display:flex;
+  gap:10px;
+  padding:18px;
+  border-top:1px solid rgba(52,211,153,0.2);
+}
+
+.pro-chat-input input{
+  flex:1;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid rgba(52,211,153,0.3);
+  background:rgba(255,255,255,0.05);
+  color:white;
+}
+
+.pro-chat-input button{
+  padding:12px 22px;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(135deg,#10b981,#059669);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.pro-chat{
+  position: fixed;
+  bottom: 100px;
+  right: 25px;
+  width: 420px;
+  height: 520px;
+  z-index: 99999;
+}
+.welcome-message{
+  text-align:center;
+  color:#94a3b8;
+  padding:40px 10px;
+}
+
+.welcome-message h2{
+  color:#34d399;
+  margin-bottom:12px;
+}
+
+.ai-user{
+  background:rgba(52,211,153,0.12);
+  padding:12px 16px;
+  border-radius:12px;
+  margin:12px 0;
+  border-left:3px solid #34d399;
+  color:#34d399;
+}
+
+.ai-bot{
+  background:rgba(255,255,255,0.05);
+  padding:12px 16px;
+  border-radius:12px;
+  margin:12px 0;
+  border-left:3px solid #10b981;
+  color:#e5e7eb;
+}
+.accuracy-card{
+  background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.05));
+  border-radius:18px;
+  padding:22px;
+  margin-top:20px;
+  border:1px solid rgba(52,211,153,0.3);
+}
+
+.accuracy-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  color:#34d399;
+  margin-bottom:10px;
+}
+
+.accuracy-value{
+  font-size:34px;
+  font-weight:800;
+  color:#10b981;
+}
+#accuracyCard {
+  display: none;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="bg-circle"></div>
+    <div class="bg-circle"></div>
+    <div class="bg-circle"></div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=100&h=100&fit=crop" alt="AgriScan Logo">
+        </div>
+        <span>AgriScan AI</span>
+      </div>
+      <div class="header-actions">
+        <div class="stats-badge">
+          🔬 <span id="scanCount">1,247</span> Scans Today
+        </div>
+        <a href="index.html" class="back-btn">← Back to Home</a>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+      <!-- Left Column: Upload -->
+      <div class="upload-container">
+        <!-- Upload Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">📸</div>
+            <h2 class="card-title">Upload Leaf Image</h2>
+          </div>
+
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">☁️</div>
+            <div class="upload-text">Click to upload or drag & drop</div>
+            <div class="upload-subtext">Get instant AI-powered disease detection</div>
+            <div class="upload-formats">
+              <span class="format-badge">JPG</span>
+              <span class="format-badge">PNG</span>
+              <span class="format-badge">JPEG</span>
+              <span class="format-badge">Max 5MB</span>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+          </div>
+
+          <div class="preview-section" id="previewSection">
+            <div class="preview-wrapper">
+              <div class="preview-overlay"></div>
+              <img id="previewImage" src="" alt="Leaf preview">
+              <div class="preview-actions">
+                <button class="action-btn" id="removeBtn" title="Remove Image">×</button>
+              </div>
+            </div>
+            <button class="analyze-btn" id="analyzeBtn">
+              🔬 Analyze with AI
+            </button>
+          </div>
+        </div>
+
+        <!-- Tips Card -->
+        <div class="card tips-card">
+          <div class="card-header">
+            <div class="card-icon">💡</div>
+            <h2 class="card-title">Pro Tips</h2>
+          </div>
+          <div class="tips-grid">
+            <div class="tip-item">
+              <div class="tip-icon">📷</div>
+              <div class="tip-content">
+                <div class="tip-title">Good Lighting</div>
+                <div class="tip-text">Take photos in natural daylight for best results</div>
+              </div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-icon">🎯</div>
+              <div class="tip-content">
+                <div class="tip-title">Close & Clear</div>
+                <div class="tip-text">Capture affected areas clearly without blur</div>
+              </div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-icon">🍃</div>
+              <div class="tip-content">
+                <div class="tip-title">Single Leaf</div>
+                <div class="tip-text">Focus on one leaf for accurate detection</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Results -->
+      <div class="results-container">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">📊</div>
+            <h2 class="card-title">Analysis Results</h2>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🌿</div>
+            <div class="empty-text">Upload a leaf image to begin AI analysis</div>
+          </div>
+
+          <!-- Loading State -->
+          <div class="loading" id="loading">
+            <div class="spinner-container">
+              <div class="spinner"></div>
+              <div class="spinner"></div>
+            </div>
+            <div class="loading-text">Analyzing Disease Pattern...</div>
+            <div class="loading-subtext">Processing with neural network</div>
+          </div>
+
+          <!-- Results Content -->
+          <div class="results-content" id="resultsContent">
+            <!-- Disease Detection Card -->
+            <div class="disease-card">
+              <div class="disease-header">
+                <div class="disease-badge">🔬 AI Detected</div>
+                <div class="disease-name" id="diseaseName">Tomato Early Blight</div>
+              </div>
+              <div class="confidence-section">
+                <div class="confidence-label">
+                  <span>Detection Confidence</span>
+                  <span id="confidenceText">94.5%</span>
+                </div>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="info-grid">
+              <!-- Disease Info -->
+              <div class="info-card">
+                <div class="info-header">
+                  <div class="info-icon-large">📚</div>
+                  <h3 class="info-title">Disease Information</h3>
+                </div>
+                <ul class="info-list" id="diseaseInfo"></ul>
+
+              </div>
+
+              <!-- Severity -->
+              <div class="info-card severity-card" id="severityCard">
+                <div class="info-header">
+                  <div class="info-icon-large">⚠️</div>
+                  <h3 class="info-title">Severity Level</h3>
+                </div>
+                <div class="severity-levels">
+                  <div class="severity-level" id="severityLow">
+                    <div class="severity-icon">🟢</div>
+                    <div class="severity-label">Low</div>
+                  </div>
+                  <div class="severity-level active" id="severityMedium">
+                    <div class="severity-icon">🟡</div>
+                    <div class="severity-label">Medium</div>
+                  </div>
+                  <div class="severity-level" id="severityHigh">
+                    <div class="severity-icon">🔴</div>
+                    <div class="severity-label">High</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Accuracy Section -->
+<div class="accuracy-card" id="accuracyCard">
+  <div class="accuracy-header">
+    <span>🎯</span>
+    <span>Detection Accuracy</span>
+  </div>
+  <div class="accuracy-value">
+    <span id="accuracyPercent">--%</span>
+  </div>
+</div>
+
+
+              <!-- Prevention -->
+              <div class="info-card">
+                <div class="info-header">
+                  <div class="info-icon-large">🛡️</div>
+                  <h3 class="info-title">Prevention Methods</h3>
+                </div>
+                <ul class="info-list" id="prevention"></ul>
+
+              </div>
+
+              <!-- Treatment -->
+              <div class="info-card">
+                <div class="info-header">
+                  <div class="info-icon-large">💊</div>
+                  <h3 class="info-title">Treatment & Care</h3>
+                </div>
+                <ul class="info-list" id="treatment"></ul>
+
+              </div>
+            </div>
+            
+
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button class="action-button" onclick="window.print()">
+                🖨️ Print Report
+              </button>
+              <button class="action-button" id="saveReport">
+                💾 Save Report
+              </button>
+              <button class="action-button" id="shareResults">
+                📤 Share Results
+              </button>
+              <button class="action-button" id="newScan">
+                🔄 New Scan
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+<!-- Floating AI Chatbot -->
+ <div id="ai-chat-fab">🤖</div>
+ 
+<div id="ai-chat-popup" class="pro-chat">
+  <div class="pro-chat-header">
+    🤖 AgriScan AI Assistant
+    <span id="ai-chat-close">×</span>
+  </div>
+
+  <div id="ai-chat-messages" class="pro-chat-messages">
+    <div class="welcome-message">
+      <h2>👋 Welcome!</h2>
+      <p>
+        I'm your AgriScan AI Assistant.  
+        Ask me anything about leaf diseases, treatment, prevention, or recovery.
+      </p>
+    </div>
+  </div>
+
+  <div class="pro-chat-input">
+    <input
+      type="text"
+      id="ai-chat-text"
+      placeholder="Ask about recovery, treatment, prevention..."
+    />
+    <button id="ai-chat-send">Send</button>
+  </div>
+</div>
+
+  <script>
+/* ===================== ELEMENT REFERENCES ===================== */
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const previewSection = document.getElementById('previewSection');
+const previewImage = document.getElementById('previewImage');
+const removeBtn = document.getElementById('removeBtn');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const emptyState = document.getElementById('emptyState');
+const loading = document.getElementById('loading');
+const resultsContent = document.getElementById('resultsContent');
+const scanCount = document.getElementById('scanCount');
+
+const severityCard = document.getElementById("severityCard");
+const accuracyCard = document.getElementById("accuracyCard");
+const confidenceBox = document.querySelector(".confidence-section");
+
+let selectedFile = null;
+let currentScanCount = 1247;
+
+/* ===================== INITIAL HIDE ===================== */
+severityCard.style.display = "none";
+accuracyCard.style.display = "none";
+confidenceBox.style.display = "none";
+
+/* ===================== FILE UPLOAD ===================== */
+uploadArea.addEventListener('click', () => fileInput.click());
+
+uploadArea.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener('change', e => {
+  handleFile(e.target.files[0]);
+});
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith("image/")) {
+    alert("Please upload an image file");
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("File size must be less than 5MB");
+    return;
+  }
+
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    previewImage.src = e.target.result;
+    previewSection.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+
+removeBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  resetAll();
+});
+
+function resetAll() {
+  selectedFile = null;
+  fileInput.value = "";
+  previewSection.style.display = "none";
+  previewImage.src = "";
+
+  emptyState.style.display = "block";
+  resultsContent.style.display = "none";
+  loading.style.display = "none";
+
+  severityCard.style.display = "none";
+  accuracyCard.style.display = "none";
+  confidenceBox.style.display = "none";
+}
+
+/* ===================== ANALYZE IMAGE ===================== */
+analyzeBtn.addEventListener("click", async () => {
+  if (!selectedFile) return;
+
+  emptyState.style.display = "none";
+  loading.style.display = "block";
+  resultsContent.style.display = "none";
+  analyzeBtn.disabled = true;
+
+  currentScanCount++;
+  scanCount.textContent = currentScanCount.toLocaleString();
+
+  try {
+    const formData = new FormData();
+    formData.append("leaf", selectedFile);
+
+    const response = await fetch("http://127.0.0.1:5000/detect", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!data.success) throw new Error("AI error");
+
+    const result = data.result;
+    window.lastAIResult = result;
+
+    /* ===================== BASIC INFO ===================== */
+
+// Reset info sections first
+updateList("diseaseInfo", []);
+updateList("prevention", []);
+updateList("treatment", []);
+
+document.getElementById("diseaseName").innerText = "No disease detected";
+
+/* ===================== LEAF CHECK ===================== */
+if (result.is_leaf === true) {
+
+  document.getElementById("diseaseName").innerText =
+    result.leaf_type + " – " + result.disease;
+
+  /* -------- Disease Info -------- */
+  updateList("diseaseInfo", [
+    "Cause: " + (result.cause || "Not available")
+  ]);
+
+  /* -------- Prevention -------- */
+  updateList("prevention", result.prevention);
+
+  /* -------- Treatment -------- */
+  updateList("treatment", result.treatment);
+}
+
+
+    /* ===================== CONFIDENCE + ACCURACY ===================== */
+    accuracyCard.style.display = "none";
+    confidenceBox.style.display = "none";
+
+    if (result.is_leaf === true) {
+      accuracyCard.style.display = "block";
+      confidenceBox.style.display = "block";
+
+      document.getElementById("accuracyPercent").innerText =
+        result.confidence + "%";
+
+      document.getElementById("confidenceText").innerText =
+        result.confidence + "%";
+
+      document.getElementById("confidenceFill").style.width =
+        result.confidence + "%";
+    }
+
+    /* ===================== SEVERITY ===================== */
+    severityCard.style.display = "none";
+    document.getElementById("severityLow").classList.remove("active");
+    document.getElementById("severityMedium").classList.remove("active");
+    document.getElementById("severityHigh").classList.remove("active");
+
+    if (
+      result.is_leaf === true &&
+      result.disease &&
+      result.disease.toLowerCase() !== "healthy" &&
+      result.disease.toLowerCase() !== "not a leaf"
+    ) {
+      severityCard.style.display = "block";
+
+      if (result.severity.toLowerCase() === "mild") {
+        document.getElementById("severityLow").classList.add("active");
+      } else if (result.severity.toLowerCase() === "moderate") {
+        document.getElementById("severityMedium").classList.add("active");
+      } else if (result.severity.toLowerCase() === "severe") {
+        document.getElementById("severityHigh").classList.add("active");
+      }
+    }
+
+    loading.style.display = "none";
+    resultsContent.style.display = "block";
+    analyzeBtn.disabled = false;
+
+  } catch (err) {
+    alert("Unable to connect to AI server");
+    console.error(err);
+    loading.style.display = "none";
+    emptyState.style.display = "block";
+    analyzeBtn.disabled = false;
+  }
+});
+function updateList(elementId, items) {
+  const list = document.getElementById(elementId);
+  list.innerHTML = "";
+
+  if (!items || items.length === 0) {
+    list.innerHTML = "<li>No data available</li>";
+    return;
+  }
+
+  items.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
+}
+
+
+/* ===================== CHATBOT ===================== */
+const fab = document.getElementById("ai-chat-fab");
+const popup = document.getElementById("ai-chat-popup");
+const closeBtn = document.getElementById("ai-chat-close");
+const sendBtn = document.getElementById("ai-chat-send");
+const chatText = document.getElementById("ai-chat-text");
+const chatMessages = document.getElementById("ai-chat-messages");
+
+fab.onclick = () => popup.style.display = "flex";
+closeBtn.onclick = () => popup.style.display = "none";
+sendBtn.onclick = sendMessage;
+
+chatText.addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+function addMsg(text, type) {
+  const div = document.createElement("div");
+  div.className = type === "user" ? "ai-user" : "ai-bot";
+  div.innerText = (type === "user" ? "You: " : "AI: ") + text;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function sendMessage() {
+  if (!window.lastAIResult) {
+    addMsg("Please analyze a leaf first.", "bot");
+    return;
+  }
+
+  const q = chatText.value.trim();
+  if (!q) return;
+
+  addMsg(q, "user");
+  chatText.value = "";
+
+  const res = await fetch("http://127.0.0.1:5000/chatbot", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      question: q,
+      disease_info: window.lastAIResult
+    })
+  });
+
+  const data = await res.json();
+  addMsg(data.answer || "AI error", "bot");
+}
+</script>
+
+
+
+
+
+</body>
+</html>
